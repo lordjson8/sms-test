@@ -1,0 +1,48 @@
+// This is your Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+   provider = "sqlite"
+ }
+
+model User {
+  id            Int      @id @default(autoincrement())
+  email         String   @unique
+  passwordHash  String
+  createdAt     DateTime @default(now())
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  contacts  Contact[]
+  smsLogs   SmsLog[]
+}
+
+model Contact {
+  id          Int      @id @default(autoincrement())
+  phoneNumber String
+  categoryId  Int
+  createdAt   DateTime @default(now())
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@index([categoryId])
+}
+
+model SmsLog {
+  id         Int      @id @default(autoincrement())
+  recipient  String
+  message    String
+  status     String   // delivered, failed, pending, sent
+  categoryId Int?
+  sentAt     DateTime @default(now())
+  twilioSid  String?  // Twilio message SID for tracking
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@index([categoryId])
+  @@index([sentAt])
+}
