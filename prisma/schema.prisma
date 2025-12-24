@@ -5,8 +5,9 @@ generator client {
 }
 
 datasource db {
-   provider = "sqlite"
- }
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
 
 model User {
   id            Int      @id @default(autoincrement())
